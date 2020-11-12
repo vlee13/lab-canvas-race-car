@@ -12,6 +12,7 @@ let bullets = [];
 let id = null;
 let score = 0;
 
+//create a car obj
 let fiat = {
   x: canvas.width / 2,
   y: canvas.height - 100,
@@ -19,6 +20,7 @@ let fiat = {
   h: 100,
 };
 
+//animate function is where all the images live and flip through ~60fps via requestAnimationFrame loop
 function animate() {
   id = window.requestAnimationFrame(animate);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -32,6 +34,7 @@ function animate() {
 }
 animate();
 
+//CONTROLS
 window.onkeydown = function (e) {
   switch (e.key) {
     case "ArrowRight":
@@ -55,10 +58,12 @@ window.onkeydown = function (e) {
       }
       break;
     case " ":
+      //make each bullet and push to bullets array on spacebar
       bullets.push(new Bullet(fiat.x, fiat.y, 20, 20));
   }
 };
 
+//make each wall in walls array
 function createWalls() {
   walls.forEach((wall) => {
     ctx.fillStyle = wall.color;
@@ -66,6 +71,7 @@ function createWalls() {
   });
 }
 
+//create wall obj with setInterval for constant repeat of walls every 2 seconds
 setInterval(() => {
   let wall = {
     x: Math.floor(Math.random() * canvas.width - 100),
@@ -77,6 +83,7 @@ setInterval(() => {
   walls.push(wall);
 }, 2000);
 
+//create obj bullet
 class Bullet {
   constructor(x, y, w, h) {
     this.x = x;
@@ -90,6 +97,7 @@ class Bullet {
   }
 }
 
+//collison detects wall to car and bullets to walls
 function checkCollision() {
   for (let wall of walls) {
     if (
@@ -101,7 +109,6 @@ function checkCollision() {
       window.cancelAnimationFrame(id);
       alert(score);
     }
-
     for (let bullet of bullets) {
       if (
         bullet.x < wall.x + wall.w &&
@@ -109,6 +116,7 @@ function checkCollision() {
         bullet.y < wall.y + wall.h &&
         bullet.y + bullet.h > wall.y
       ) {
+        //when bullet hits wall, splice out that specific bullet and wall & update score
         walls.splice(walls.indexOf(wall), 1);
         bullets.splice(bullets.indexOf(bullet), 1);
         score += 10;
