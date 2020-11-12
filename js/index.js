@@ -8,6 +8,23 @@ const roadImg = new Image();
 roadImg.src = "/images/road.png";
 let id = null;
 let score = 0;
+
+function animate() {
+  id = window.requestAnimationFrame(animate);
+  ctx.clearRect(0, 0, 500, 700);
+  ctx.drawImage(roadImg, 0, 0, canvas.width, canvas.height);
+  miniCooper.drawCar();
+  for (obs of obstacless) {
+    obs.drawObstacle();
+    obs.checkCollision();
+  }
+  for (bullet of bullets) {
+    bullet.drawBullet();
+  }
+  score++;
+}
+animate();
+
 class Car {
   constructor(img, x, y, w, h) {
     this.img = img;
@@ -20,28 +37,16 @@ class Car {
     ctx.drawImage(this.img, this.x, this.y, this.w, this.h);
   }
 }
+
 let miniCooper = new Car(carImg, 250, 600, 50, 100);
-let bullets = [];
-window.onkeydown = function (event) {
-  switch (event.key) {
-    case "ArrowLeft":
-      if (miniCooper.x > miniCooper.w) miniCooper.x -= 10;
-      break;
-    case "ArrowRight":
-      if (miniCooper.x < canvas.width - 2 * miniCooper.w) miniCooper.x += 10;
-      break;
-    case " ":
-      bullets.push(new Bullet(miniCooper.x, miniCooper.y, 10, 10));
-      break;
-  }
-};
+
 class Obstacle {
-  constructor(x, y, w, h) {
+  constructor(x, y, w, h, color) {
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
-    this.color = "#" + (((1 << 24) * Math.random()) | 0).toString(16);
+    this.color = color;
   }
   drawObstacle = () => {
     ctx.fillStyle = this.color;
@@ -70,6 +75,7 @@ class Obstacle {
     }
   };
 }
+
 class Bullet {
   constructor(x, y, w, h) {
     this.x = x;
@@ -83,27 +89,30 @@ class Bullet {
     this.y--;
   }
 }
+
+let bullets = [];
+window.onkeydown = function (event) {
+  switch (event.key) {
+    case "ArrowLeft":
+      if (miniCooper.x > miniCooper.w) miniCooper.x -= 10;
+      break;
+    case "ArrowRight":
+      if (miniCooper.x < canvas.width - 2 * miniCooper.w) miniCooper.x += 10;
+      break;
+    case " ":
+      bullets.push(new Bullet(miniCooper.x, miniCooper.y, 10, 10));
+      break;
+  }
+};
+
 let obstacless = [];
 let random = () =>
   Math.random() * (canvas.width - miniCooper.w * 2 - 100) + miniCooper.w;
+
 setInterval(function () {
-  obstacless.push(new Obstacle(random(), 0, 100, 20));
+  let randomColor = "#" + (((1 << 24) * Math.random()) | 0).toString(16);
+  obstacless.push(new Obstacle(random(), 0, 100, 20, randomColor));
 }, 1000);
-// collision detected!
-function animate() {
-  id = window.requestAnimationFrame(animate);
-  ctx.drawImage(roadImg, 0, 0, canvas.width, canvas.height);
-  miniCooper.drawCar();
-  for (obs of obstacless) {
-    obs.drawObstacle();
-    obs.checkCollision();
-  }
-  for (bullet of bullets) {
-    bullet.drawBullet();
-  }
-  score++;
-}
-animate();
 
 // document.getElementById("start-button").onclick = () => {
 //   startGame();
@@ -124,7 +133,6 @@ animate();
 //   y: 530,
 // };
 
-// let i = 0;
 // let id = null;
 // let walls = [];
 // let score = 0;
@@ -134,9 +142,8 @@ animate();
 //   ctx.clearRect(0, 0, 500, 700);
 //   ctx.drawImage(roadImg, 0, 0, 400, 650);
 //   drawCar();
-//   createWall(i);
+//   createWall();
 //   checkCollision();
-//   i += 1;
 //   if (frames % 100 === 0) {
 //     score += 100;
 //     document.querySelector("#scoreboard").innerText = score;
@@ -165,20 +172,20 @@ animate();
 //   ctx.drawImage(carImage, carObj.x, carObj.y, carObj.width, carObj.height);
 // }
 
-// function createWall(i) {
+// function createWall() {
 //   walls.forEach((wall) => {
 //     ctx.fillStyle = wall.color;
-//     wall.y = i;
-//     ctx.fillRect(wall.x, wall.y, wall.width, wall.height);
+//     ctx.fillRect(wall.x, wall.y++, wall.width, wall.height);
 //   });
 // }
+
 // setInterval(() => {
 //   let wall = {
 //     color: "red",
 //     width: 200 + Math.floor(Math.random() * 10),
 //     height: 50,
 //     x: Math.floor(Math.random() * (canvas.width - 100)),
-//     y: canvas.height - 50,
+//     y: 0,
 //   };
 //   walls.push(wall);
 // }, 3000);
